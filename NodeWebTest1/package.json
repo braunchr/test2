@@ -1,9 +1,0 @@
-{
-  "name": "node-web-test1",
-  "version": "0.0.0",
-  "description": "NodeWebTest1",
-  "main": "server.js",
-  "author": {
-    "name": "Christophe-pcraid"
-  }
-}

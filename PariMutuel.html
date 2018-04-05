@@ -1,0 +1,70 @@
+﻿<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>this is a test</title>
+    <meta charset="UTF-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="PariMutuel.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="PariMutuel.css">
+
+    <script>
+  
+    </script>
+
+</head>
+
+
+<body onload="init();">
+    <div style="width: 800px;" >
+        
+
+        <div class="item_line">
+            <button onclick="clearResults()">Clear</button>
+            <button onclick="init()">Recalculate</button>
+            <button onclick="send()">Send</button>
+        </div>
+        
+        <div class="item_line">
+            <label>Nr of Horses</label> <input id="MaxRunners" style="width:100px" value="4">
+            <label>Exacta Depth</label> <input id="ExactaDepth" style="width:100px" value="2">     
+            <label>Iterations</label> <input id="iter" style="width:100px" value="500">     
+        </div>
+
+        
+        <div class="item_line">
+          <br /><p>MINGLED</p>
+            <div style="display: flex">
+                <p style="width:140px ; text-indent:20px"> WINS </p>
+                <p style="width:130px"> PLACE   </p>
+                <p style="width:120px"> EXACTA   </p>
+
+            </div>
+            <div style="display: flex">
+                <div id="list1" ; style="height:300px;width:100px;border:1px solid #ccc;background-color:white;overflow:auto; margin:1%">   </div>
+                <div id="list2" ; style="height:300px;width:100px;border:1px solid #ccc;background-color:white;overflow:auto; margin:1%">   </div>
+                <div id="list3" ; style="height:300px;width:100px;border:1px solid #ccc;background-color:white;overflow:auto; margin:1%">   </div>
+            </div>
+        </div>
+
+
+        <div class="item_line">
+            <br /><p>UNMINGLED</p>
+            <div style="display: flex">
+                <p style="width:140px ; text-indent:20px"> WINS </p>
+                <p style="width:130px"> PLACE   </p>
+                <p style="width:120px"> EXACTA   </p>
+
+            </div>
+            <div style="display: flex">
+                <div id="list4" ; style="height:300px;width:100px;border:1px solid #ccc;background-color:white;overflow:auto; margin:1%">   </div>
+                <div id="list5" ; style="height:300px;width:100px;border:1px solid #ccc;background-color:white;overflow:auto; margin:1%">   </div>
+                <div id="list6" ; style="height:300px;width:100px;border:1px solid #ccc;background-color:white;overflow:auto; margin:1%">   </div>
+            </div>
+        </div>
+
+        </div>
+    
+</body>
+</html>
