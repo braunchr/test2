@@ -51,7 +51,7 @@ function send(){
 
 var data = {"name": "Christophe",
             "surname": "Braun",
-            "arr": [1,2,3,4,5],
+            "arr": [1,2,3,4,5,6],
 }
 
 
