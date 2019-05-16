@@ -1,17 +1,20 @@
-'use strict';
 
-var express = require('express');
+var express = require("express");
 var app = express();
-var bodyParser = require('body-parser');
 
-app.use(bodyParser.json()); // for parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+// prepare the server for database handling
+var mongoose = require("mongoose"); 
 
-app.post('/', function (req, res) {
-    console.log(req.body);
+mongoose.connect('mongodb://newuser1:' + process.env.MONGO_ATLAS_PWD +'@testdb-shard-00-00-id5j4.mongodb.net:27017,testdb-shard-00-01-id5j4.mongodb.net:27017,testdb-shard-00-02-id5j4.mongodb.net:27017/test?ssl=true&replicaSet=TestDB-shard-0&authSource=admin')
+.then(res => {console.log('Successful connection' + res)})
+.catch(err => {console.log('Could not connect to the database - probably pwd not set ' + err)});
 
-    res.send(req.body)
-});
+
+// add the various routes stored in the routes directory
+
+var pariRoute = require('./routes/pariRoute'); 
+app.use('/parimutuel', pariRoute); //first argument is the filter, the second the handler
+
 
 app.use(express.static('.'));
 

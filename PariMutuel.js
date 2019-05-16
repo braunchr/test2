@@ -20,62 +20,73 @@ function init() {
 
 
     // this is where you add bets to each runner. the functions take any number of arguments
-    addExBet([0, 20], [1, 20], [2, 30], [3, 40], [4, 20], [5, 30], [6, 10], [7, 20], [8, 30], [9, 5], [10, 20], [11, 30]);
-    addWinBet([0, 150], [1, 300], [2, 140],[3,310]);
-    addPlaceBet([0, 90], [1, 120], [2, 80], [3, 110]);
+    //addExBet([0, 20], [1, 20], [2, 30], [3, 50], [4, 30], [5, 40], [6, 10], [7, 20], [8, 30], [9, 15], [10, 20], [11, 30]);
+    //addWinBet([0, 150], [1, 210], [2, 110], [3, 130]);
+    //addPlaceBet([0, 80], [1, 100], [2, 50], [3, 60]);
+
+    addExBet([0, 1] );
+    addWinBet([0, 150], [1, 10], [2, 10]);
+    addPlaceBet([0, 1]);
+    
 
     // iterate through the three steps of splitting hte win bets, the place bets, aggregate all of them and start again
     var iterations = Number(document.getElementById("iter").value);
 
 
-    for (var i = 0; i < iterations / 10; i++) {
-
-        for (var j = 0; j < 10; j++) {
-            splitBets(winA);
-            splitBets(placeA);
-            aggregateBets();
-        }
-
-        averageSplits(winA);
-        averageSplits(placeA);
+    for (var i = 0; i < iterations; i++) {
+        splitBets(winA);
+        splitBets(placeA);
         aggregateBets();
-
     }
+
     // display whihchever calculation you want to display
     showResults();
 
 }
 
-function send(){
-    var xhr = new XMLHttpRequest();
+function send() {
 
-var data = {"name": "Christophe",
-            "surname": "Braun",
-            "arr": [1,2,3,4,5,6,7],
+    var xhr = new XMLHttpRequest();
+    var data = {
+        "exA": exA, 
+        "winA": winA,
+        "placeA": placeA
+    }
+
+    xhr.open('POST', 'http://localhost:3000/parimutuel', true);
+    xhr.setRequestHeader("content-type", "application/json;charset=UTF-8");
+    xhr.send(JSON.stringify(data));
+    xhr.onload = function () {
+        // Process the response here
+        console.log(xhr.response)
+        var ans = JSON.parse(xhr.response);
+    }
+
 }
 
 
-xhr.open('POST', 'http://localhost:3000/', true);
-xhr.setRequestHeader("content-type","application/json;charset=UTF-8");
-xhr.onload = function () {
-  console.log(xhr.response)
-  var ans =  JSON.parse(xhr.response).arr[1];
-    // Request finished. Do processing here.
-};
+function deleteDB() {
 
-xhr.send(JSON.stringify(data));
-//xhr.send('HELLO from GET');
-//xhr.send("first hello")
-// xhr.send(new Blob());
-// xhr.send(new Int8Array());
-// xhr.send({ form: 'data' });
-// xhr.send(document);
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open('DELETE', 'http://localhost:3000/parimutuel', true);
+    xhr.send();
+    xhr.onload = function () {
+        // Process the response here
+        console.log(xhr.response)
+        var ans = JSON.parse(xhr.response);
+    }
+
 }
 
 function showResults() {
 
     var pot;
     var st;
+    var resObj = {
+        
+        unmgWinA : {pot: String, arr:[] },
+    };
 
     //******************************
     //  UNMINGLED WINS
@@ -87,7 +98,7 @@ function showResults() {
     winA.forEach(function (bet) {
         pot += bet.amt;
     });
-    
+
     // then calculate and output each of the odds for each win 
     winA.forEach(function (bet) {
         if (pot / bet.amt < 1000) {
@@ -137,7 +148,7 @@ function showResults() {
     //  MINGLED EXACTA
     //******************************
 
-    // first calculate the total win pot by summing all win bets across the win array
+    // first calculate the total win pot by summing all win bets across the exacta array
     pot = 0;
 
     exA.forEach(function (bet) {
@@ -146,7 +157,7 @@ function showResults() {
 
     // then calculate and output each of the odds for each win 
     exA.forEach(function (bet) {
-        if (pot / bet.mingledAmt < 1000) {
+        if (pot / bet.mingledAmt < 1000 && bet.amt > 1) {
             st = (pot / bet.mingledAmt).toFixed(2).toString();
             document.getElementById("list3").innerHTML += "<div>" + st + "</div>";
         }
@@ -174,7 +185,7 @@ function showResults() {
 
         mingledOdd = winReturn / bet.amt;  // the mingled odds are the ratio of the Win bets (bet.amt) to the winReturns
 
-        if (mingledOdd < 1000) {
+        if (mingledOdd < 1000 && bet.amt > 1) {
             st = mingledOdd.toFixed(2).toString();
             document.getElementById("list1").innerHTML += "<div>" + st + "</div>";
         }
@@ -201,19 +212,19 @@ function showResults() {
 
         var ind = bet.splitA[0].exIndex;   // take the first split. Returns are the same for all splits
         var exOdd = pot / exA[ind].mingledAmt;  // take the first split to compute the exacta mingled odds of that split
-        var winReturn = bet.splitA[0].splitAmt * exOdd;  // calculate the return for that first split using the exacta odds
+        var placeReturn = bet.splitA[0].splitAmt * exOdd;  // calculate the return for that first split using the exacta odds
 
-        mingledOdd = winReturn / bet.amt;  // the mingled odds are the ratio of the Win bets (bet.amt) to the winReturns
+        mingledOdd = placeReturn / bet.amt;  // the mingled odds are the ratio of the Win bets (bet.amt) to the winReturns
 
 
-        if (mingledOdd < 1000) {
+        if (mingledOdd < 1000 && bet.amt > 1) {
             st = mingledOdd.toFixed(2).toString();
             document.getElementById("list2").innerHTML += "<div>" + st + "</div>";
         }
 
     });
 
-// this inserts a blank line so that you can re-run another iteration and see the line break. 
+    // this inserts a blank line so that you can re-run another iteration and see the line break. 
     document.getElementById("list1").innerHTML += "</br>";
     document.getElementById("list2").innerHTML += "</br>";
     document.getElementById("list3").innerHTML += "</br>";
@@ -238,7 +249,7 @@ function clearResults() {
 
 
 
-function splitBets(betArray) { 
+function splitBets(betArray) {
 
     // the parameter passed is the array of bets, so we can pass WinArray or PlaceArray, because the model and calcs are the same for wins and place
     betArray.forEach(function (betValue) {
@@ -258,40 +269,8 @@ function splitBets(betArray) {
         });
 
     });
-       
-}
-
-
-
-function averageSplits(betArray) {
-
-    // the parameter passed is the array of bets, so we can pass WinArray or PlaceArray, because the model and calcs are the same for wins and place
-    betArray.forEach(function (betValue) {
-        var unsplitAmt = betValue.amt;
-        var splitA = betValue.splitA;
-        var averageSplit = 0;
-        var totExAmt = 0;
-
-        // first cycle through all the win/place splits to compute the total Exacta amounts
-        splitA.forEach(function (splitVal) {
-            totExAmt += exA[splitVal.exIndex].mingledAmt;
-        });
-        
-        // compute the average of the splits
-        splitA.forEach(function (splitVal) {
-            averageSplit += splitVal.splitAmt/splitA.length;
-        });
-
-        // then cycle again to compute the new splits from the average amount
-        splitA.forEach(function (splitVal) {
-            splitVal.splitAmt = averageSplit * exA[splitVal.exIndex].mingledAmt / totExAmt;
-        });
-
-    });
 
 }
-
-
 
 
 
@@ -301,13 +280,13 @@ function aggregateBets() {
     exA.forEach(function (val) {
         val.oldMingledAmt = val.mingledAmt;  //old amounts are only used for internal data in case you compare iterations. Not necessary otherwise
         val.mingledAmt = val.amt;  // store the first component of the mingled amount to be the exacta bet. The next steps add win and place splits
-        });
+    });
 
     // then add each win split
     winA.forEach(function (winAEntry) {
         var splitA = winAEntry.splitA;  // splitA is the array conaining the splits
         splitA.forEach(function (splitVal) {  // perform another loop for each win bet
-            exA[splitVal.exIndex].mingledAmt +=  splitVal.splitAmt;
+            exA[splitVal.exIndex].mingledAmt += splitVal.splitAmt;
         });
     });
 
@@ -341,7 +320,7 @@ function initialiseExactaArray() {
         for (var i = 0; i < maxRunners; i++) {
             for (var j = 0; j < maxRunners; j++) {
                 if (j != i) {
-                    exA[index++] = { amt: seedBet, mingledAmt: seedBet, seq: [i, j], oldMingledAmt: seedBet}
+                    exA[index++] = { amt: seedBet, mingledAmt: seedBet, seq: [i, j], oldMingledAmt: seedBet }
                 }
             }
         }
@@ -353,7 +332,7 @@ function initialiseExactaArray() {
                 for (var k = 0; k < maxRunners; k++) {
 
                     if (j != i && k != i && k != j) {
-                        exA[index++] = { amt: seedBet, mingledAmt: seedBet, seq: [i, j, k] , oldMingledAmt:seedBet}
+                        exA[index++] = { amt: seedBet, mingledAmt: seedBet, seq: [i, j, k], oldMingledAmt: seedBet }
                     }
                 }
             }
@@ -380,7 +359,7 @@ function initialiseWinArray() {
 
         for (var exInd = 0; exInd < exA.length; exInd++) {
             if (runNum == exA[exInd].seq[0]) {
-                thisWinA[winInd++] = { splitAmt: seedBet, exIndex: exInd, oldSplitAmt:seedBet }
+                thisWinA[winInd++] = { splitAmt: seedBet, exIndex: exInd, oldSplitAmt: seedBet }
             }
         }
         winA[runNum] = { amt: seedBet, splitA: thisWinA };
@@ -395,7 +374,7 @@ function initialisePlaceArray() {
         var thisPlaceA = [];
         var placeInd = 0;
         var foundPlaceInExacta = false;
-       
+
         for (var exInd = 0; exInd < exA.length; exInd++) {
             if (exactaDepth == 2)
                 foundPlaceInExacta = runNum == exA[exInd].seq[0] || runNum == exA[exInd].seq[1];

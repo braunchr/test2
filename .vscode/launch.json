@@ -12,17 +12,23 @@
         "url": "http://localhost:3000/parimutuel.html",
         "webRoot": "${workspaceFolder}"
     },
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Start Node",
-            "program": "${workspaceFolder}/server.js"
-        },
-    ],
-    "compounds": [
-        {
-            "name": "Server/Client",
-            "configurations": ["Start Node", "Start Chrome"]
+    {
+        "type": "node",
+        "request": "launch",
+        "name": "Start Node",
+        "program": "${workspaceFolder}/server.js",
+        "env": {
+            "MONGO_ATLAS_PWD": "newuser1"
         }
-    ]
+    },
+],
+"compounds": [
+    {
+        "name": "Server/Client",
+        "configurations": [
+            "Start Node",
+            "Start Chrome"
+        ]
+    }
+]
 }
